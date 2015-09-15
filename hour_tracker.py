@@ -30,7 +30,6 @@ class Mediator():
 			return 1
 		elif argument == "s":
 			self.execution = self.actor.stopTimer
-			return 1
 		elif argument == "n":
 			self.execution = self.actor.addNotes
 			return 1
@@ -91,10 +90,17 @@ class Actor():
 			duration = end - start
 			duration = time.strftime("%H:%M:%S",time.gmtime(duration))
 			today = time.strftime("%Y-%m-%d",time.gmtime(time.time()))
-			sql_stop = "UPDATE %(table)s SET end=%(end)s, duration='%(duration)s', day = '%(today)s' WHERE id=%(id)s;"%{"table":table,"end":end,"duration":duration,"today":today,"id":theID}
+			print start
+			print theID
+			print end
+	 		print "\n please enter notes for latest entry\n"
+	 		u_notes = raw_input()
+			sql_stop = "UPDATE %(table)s SET end=%(end)s, duration='%(duration)s', day ='%(today)s', notes=\"%(notes)s\" WHERE id=%(id)d;"%{"table":table,"end":end,"duration":duration,"today":today, 'notes':str(u_notes), "id":theID}
 			self.tryQuery(sql_stop)
 			self.closeOut()
-			return "that went through\ntotal time: "+duration+"\nbyebye"
+			print "that went through\ntotal time: "+duration+"\nbyebye"
+			return "\n nice notes. i am sure your employer is going absolutely gaga"			
+
 
 	def goTimer(self,table):
 		sql_verify_insert = "SELECT count(end), end FROM %(table)s order by id desc limit 1;" % {'table':table}
@@ -112,29 +118,21 @@ class Actor():
  			self.closeOut()
  			return "don't forget to end!"
 
- 	def addNotes(self,table):
- 		print "how many entries back are you trying to look? Please enter an integer\n"
- 		limit = raw_input()
- 		if self.tryInt(limit) == False:
- 			return "that was not an int you are dumb."
- 		limit = int(limit)
- 		sql_show_rows = "SELECT id, FROM_UNIXTIME(start) FROM %(table)s order by id desc limit %(limit)d;" % {'table':table,'limit':limit}
- 		self.tryQuery(sql_show_rows)
- 		result = self.cur.fetchall()
- 		print "\n\n please choose an ID to add a note to(must be integer):\n"
- 		for i in result:
- 			print "\tID: "+str(i[0]) + "  from date(starttime): " + str(i[1])
- 		n_id = raw_input()
- 		if self.tryInt(n_id)==False:
- 			return "that was not an int you are dumb."
- 		n_id = int(n_id)
- 		print "enter your notes below (mysqldb does not include parametized strings so escape all double quotes plz sry):\n"
- 		u_notes = raw_input()
- 		print u_notes
- 		sql_note_query = "UPDATE %(table)s SET notes = \"%(notes)s\"" WHERE id = %(n_id)d;" % {'table':table,'notes':str(u_notes),'n_id':n_id} 
- 		self.tryQuery(sql_note_query)
- 		self.closeOut()
- 		return "nice notes. i am sure your employer is going absolutely gaga"
+ 	# def addNotes(self,table):
+ 		
+ 	# 	# if self.tryInt(limit) == False:
+ 	# 	# 	return "that was not an int you are dumb."
+ 	# 	# limit = int(limit)
+ 	# 	# sql_show_rows = "SELECT id, FROM_UNIXTIME(start) FROM %(table)s order by id desc limit %(limit)d;" % {'table':table,'limit':limit}
+ 	# 	# self.tryQuery(sql_show_rows)
+ 	# 	# result = self.cur.fetchall()
+ 	# 	# print "\n\n please choose an ID to add a note to(must be integer):\n"
+ 	# 	# for i in result:
+ 	# 	# 	print "\tID: "+str(i[0]) + "  from date(starttime): " + str(i[1])
+ 	# 	# n_id = raw_input()
+ 	# 	# if self.tryInt(n_id)==False:
+ 	# 	# 	return "that was not an int you are dumb."
+ 	# 	# n_id = int(n_id)
  		
  			
 	def createTimer(self,table):
